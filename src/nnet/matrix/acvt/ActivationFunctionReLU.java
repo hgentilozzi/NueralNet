@@ -7,7 +7,7 @@ public class ActivationFunctionReLU implements ActivationFunction {
 
 	@Override
 	public double f(double in) {
-		return Math.max(0, in);
+		return Math.max(-0.01, in);
 	}
 
 	@Override

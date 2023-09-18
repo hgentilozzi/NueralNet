@@ -5,8 +5,9 @@ import java.util.List;
 
 import nnet.exception.NNetInvalidMatrixOp;
 import nnet.exception.NNetInvalidNetwork;
-import nnet.matrix.NNetPerceptron;
+import nnet.matrix.NNetMatrix;
 import nnet.matrix.acvt.ActivationFunction;
+import nnet.matrix.data.*;
 
 public class Network {
 	private int numLayers;
@@ -14,6 +15,7 @@ public class Network {
 	private Layer inputLayer;
 	private Layer outputLayer;
 	private TrainingStats stats;
+	private int debugLevel;
 	
 
 	public Network(ActivationFunction acvtFunc,int ... layersizes) throws NNetInvalidNetwork {
@@ -47,17 +49,49 @@ public class Network {
 		outputLayer = layers.get(layers.size()-1);
 		
 		stats = new TrainingStats();
+		debugLevel = 0;
 		
 	}
 
-	public void train(NNetPerceptron iData, NNetPerceptron oData, int iterations) throws NNetInvalidMatrixOp 
-	{
-		train(iData,oData,iterations,0);
+	public int getDebugLevel() {
+		return debugLevel;
 	}
-	
-	public void train(NNetPerceptron iData, NNetPerceptron oData, int iterations,double tolerance) throws NNetInvalidMatrixOp 
+
+	public void setDebugLevel(int debugLevel) {
+		this.debugLevel = debugLevel;
+	}
+
+	/**
+	 * Train using an input stream of and train each batch
+	 * @param batchData  - all input data and expected results
+	 * @param iterations
+	 * @throws NNetInvalidMatrixOp
+	 */
+	public void train(NnetBatchDataIntf batchData, int iterations) throws NNetInvalidMatrixOp 
 	{
 		stats.clear();
+		for (int iter=0;iter<iterations;iter++)
+		{
+			batchData.reset();
+			while (!batchData.atEof()) {
+				NNetBatch b = batchData.nextBatch();
+				train(b.inData(),b.expectedResults(),1,0);
+			}
+		}
+		stats.finalLoss = getLoss();
+		stats.finalResult = outputLayer.getOutputValues();
+	}
+
+	public void train(NNetMatrix iData, NNetMatrix oData, int iterations) throws NNetInvalidMatrixOp 
+	{
+		stats.clear();
+		train(iData,oData,iterations,0);
+		stats.finalLoss = getLoss();
+		stats.finalResult = outputLayer.getOutputValues();
+	}
+	
+	public void train(NNetMatrix iData, NNetMatrix oData, int iterations,double tolerance) throws NNetInvalidMatrixOp 
+	{
 		
 		inputLayer.setInputData(iData);
 		outputLayer.setExpectedData(oData);
@@ -70,20 +104,27 @@ public class Network {
 			for (int i=layers.size()-1;i>=0;i--)
 				layers.get(i).backPropigation();	
 
-			stats.totalIterations++; 
-
 			double loss = getLoss();
 			if (tolerance>0 && loss>-tolerance && loss < tolerance)
 					break;
+			
+			if (debugLevel>0)
+			{
+				outputLayer.getOutputValues().print("OL->avalues");
+				outputLayer.getInputLayer().getWeights().print("OL->weights");
+			}
+			System.out.println(stats.totalIterations + "," + loss);
+
+
+			stats.totalIterations++; 
+
 		}
 
-		stats.finalLoss = getLoss();
-		stats.finalResult = outputLayer.getOutputValues();
 
 	}
 	
 	
-	public NNetPerceptron predict(NNetPerceptron iData) throws NNetInvalidMatrixOp
+	public NNetMatrix predict(NNetMatrix iData) throws NNetInvalidMatrixOp
 	{
 		inputLayer.setInputData(iData);
 		

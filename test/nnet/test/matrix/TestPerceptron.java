@@ -5,14 +5,14 @@ import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
 
 import nnet.exception.NNetInvalidMatrixOp;
-import nnet.matrix.NNetPerceptron;
+import nnet.matrix.NNetMatrix;
 
 class TestPerceptron {
 
 	@Test
 	void testMultuplySqrMatic() {
-		NNetPerceptron x = new NNetPerceptron(2,2);
-		NNetPerceptron y = new NNetPerceptron(2,2);
+		NNetMatrix x = new NNetMatrix(2,2);
+		NNetMatrix y = new NNetMatrix(2,2);
 		
 		x.set(0, 0, 1);
 		x.set(0, 1, 2);
@@ -24,7 +24,7 @@ class TestPerceptron {
 		y.set(1, 0, 7);
 		y.set(1, 1, 8);
 		
-		NNetPerceptron z=null;
+		NNetMatrix z=null;
 		try {
 			z = x.dot(y);
 		} catch (NNetInvalidMatrixOp e) {
@@ -41,8 +41,8 @@ class TestPerceptron {
 	
 	@Test
 	void testMultuplyRectMatic() {
-		NNetPerceptron x = new NNetPerceptron(3,2);
-		NNetPerceptron y = new NNetPerceptron(2,3);
+		NNetMatrix x = new NNetMatrix(3,2);
+		NNetMatrix y = new NNetMatrix(2,3);
 		
 		x.set(0, 0, 1);
 		x.set(0, 1, 2);
@@ -58,7 +58,7 @@ class TestPerceptron {
 		y.set(1, 1, 8);
 		y.set(1, 2, 10);
 		
-		NNetPerceptron z=null;
+		NNetMatrix z=null;
 		try {
 			z = x.dot(y);
 		} catch (NNetInvalidMatrixOp e) {
@@ -73,14 +73,14 @@ class TestPerceptron {
 
 	@Test
 	void testTransPose() {
-		NNetPerceptron x = new NNetPerceptron(2,2);
+		NNetMatrix x = new NNetMatrix(2,2);
 		
 		x.set(0, 0, 1);
 		x.set(0, 1, 2);
 		x.set(1, 0, 3);
 		x.set(1, 1, 4);
 		
-		NNetPerceptron z = x.transpose();
+		NNetMatrix z = x.transpose();
 		
 		assertEquals(1.0,z.get(0,0));
 		assertEquals(3.0,z.get(0,1));
@@ -90,8 +90,8 @@ class TestPerceptron {
 
 	@Test
 	void testAdd() {
-		NNetPerceptron x = new NNetPerceptron(2,2);
-		NNetPerceptron y = new NNetPerceptron(2,2);
+		NNetMatrix x = new NNetMatrix(2,2);
+		NNetMatrix y = new NNetMatrix(2,2);
 		
 		x.set(0, 0, 1);
 		x.set(0, 1, 2);
@@ -103,7 +103,7 @@ class TestPerceptron {
 		y.set(1, 0, 7);
 		y.set(1, 1, 8);
 		
-		NNetPerceptron z = x.add(y);
+		NNetMatrix z = x.add(y);
 		
 		assertEquals(6.0,z.get(0,0));
 		assertEquals(8.0,z.get(0,1));
@@ -113,8 +113,8 @@ class TestPerceptron {
 
 	@Test
 	void testSubtract() {
-		NNetPerceptron x = new NNetPerceptron(2,2);
-		NNetPerceptron y = new NNetPerceptron(2,2);
+		NNetMatrix x = new NNetMatrix(2,2);
+		NNetMatrix y = new NNetMatrix(2,2);
 		
 		x.set(0, 0, 1);
 		x.set(0, 1, 2);
@@ -126,7 +126,7 @@ class TestPerceptron {
 		y.set(1, 0, 7);
 		y.set(1, 1, 8);
 		
-		NNetPerceptron z = x.subtract(y);
+		NNetMatrix z = x.subtract(y);
 		
 		assertEquals(-4.0,z.get(0,0));
 		assertEquals(-4.0,z.get(0,1));
@@ -137,7 +137,7 @@ class TestPerceptron {
 	@Test
 	void testFromArray() {
 		double[][] data = new double[][] {{1,2,3},{3,4,5}};
-		NNetPerceptron x = new NNetPerceptron(data);
+		NNetMatrix x = new NNetMatrix(data);
 		
 		assertEquals(2,x.getRows());
 		assertEquals(3,x.getCols());
@@ -147,13 +147,13 @@ class TestPerceptron {
 	@Test
 	void testgetRowVector() {
 		// Square matrix
-		NNetPerceptron x = (NNetPerceptron) NNetPerceptron.createIdentMatrix(2,2);
+		NNetMatrix x = (NNetMatrix) NNetMatrix.createIdentMatrix(2,2);
 		x.set(0, 0, 1);
 		x.set(0, 1, 2);
 		x.set(1, 0, 3);
 		x.set(1, 1, 4);
 		
-		NNetPerceptron rowvec = x.getRowVector(0);
+		NNetMatrix rowvec = x.getRowVector(0);
 		assertEquals(1, rowvec.get(0, 0));
 		assertEquals(2, rowvec.get(0, 1));
 
@@ -166,13 +166,13 @@ class TestPerceptron {
 	@Test
 	void testgetColVector() {
 		// Square matrix
-		NNetPerceptron x = (NNetPerceptron) NNetPerceptron.createIdentMatrix(2,2);
+		NNetMatrix x = (NNetMatrix) NNetMatrix.createIdentMatrix(2,2);
 		x.set(0, 0, 1);
 		x.set(0, 1, 2);
 		x.set(1, 0, 3);
 		x.set(1, 1, 4);
 		
-		NNetPerceptron colvec = x.getColumnVector(0);
+		NNetMatrix colvec = x.getColumnVector(0);
 		assertEquals(1, colvec.get(0, 0));
 		assertEquals(3, colvec.get(1, 0));
 	
@@ -184,7 +184,7 @@ class TestPerceptron {
 	
 	@Test
 	void testSquare() {
-		NNetPerceptron x = new NNetPerceptron(2,2);
+		NNetMatrix x = new NNetMatrix(2,2);
 		x.set(0, 0, 1);
 		x.set(0, 1, 2);
 		x.set(1, 0, 3);
@@ -203,7 +203,7 @@ class TestPerceptron {
 	@Test
 	void testCreateIdentMatrix() {
 		// Square matrix
-		NNetPerceptron x = NNetPerceptron.createIdentMatrix(2,2);
+		NNetMatrix x = NNetMatrix.createIdentMatrix(2,2);
 	
 		for (int r=0;r<x.getRows();r++) {
 			for (int c=0;c<x.getCols();c++) {
@@ -215,7 +215,7 @@ class TestPerceptron {
 		}
 	
 		// Horizontal rectangle matrix
-		x = NNetPerceptron.createIdentMatrix(2,3);
+		x = NNetMatrix.createIdentMatrix(2,3);
 	
 		for (int r=0;r<x.getRows();r++) {
 			for (int c=0;c<x.getCols();c++) {
@@ -227,7 +227,7 @@ class TestPerceptron {
 		}
 		
 		// Vertical rectangle matrix
-		x = NNetPerceptron.createIdentMatrix(5,2);
+		x = NNetMatrix.createIdentMatrix(5,2);
 	
 		for (int r=0;r<x.getRows();r++) {
 			for (int c=0;c<x.getCols();c++) {

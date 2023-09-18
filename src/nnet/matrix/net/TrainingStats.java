@@ -1,11 +1,11 @@
 package nnet.matrix.net;
 
-import nnet.matrix.NNetPerceptron;
+import nnet.matrix.NNetMatrix;
 
 public class TrainingStats {
 	public int totalIterations;
 	public double finalLoss;
-	public NNetPerceptron finalResult; 
+	public NNetMatrix finalResult; 
 
 	public TrainingStats() {
 		clear();

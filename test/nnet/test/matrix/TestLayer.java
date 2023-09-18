@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
 
 import nnet.exception.NNetInvalidMatrixOp;
-import nnet.matrix.NNetPerceptron;
+import nnet.matrix.NNetMatrix;
 import nnet.matrix.net.*;
 
 class TestLayer {
@@ -15,7 +15,7 @@ class TestLayer {
 	void testInputLayer() throws NNetInvalidMatrixOp {
 		// One row batch
 		double[][] data = new double[][] {{1,2}};
-		NNetPerceptron x = new NNetPerceptron(data);
+		NNetMatrix x = new NNetMatrix(data);
 		Layer l = new Layer(LayerType.INPUT_LAYER,2);
 		l.setInputData(x);
 		
@@ -26,7 +26,7 @@ class TestLayer {
 
 		// two row batch
 		data = new double[][] {{1,2},{3,4}};
-		x = new NNetPerceptron(data);
+		x = new NNetMatrix(data);
 		l = new Layer(LayerType.INPUT_LAYER,2);
 		l.setInputData(x);
 		
@@ -42,13 +42,13 @@ class TestLayer {
 	void testOutputLayer() throws NNetInvalidMatrixOp {
 		// One row batch input layer
 		double[][] idata = new double[][] {{1}};
-		NNetPerceptron im = new NNetPerceptron(idata);
+		NNetMatrix im = new NNetMatrix(idata);
 		Layer il = new Layer(LayerType.INPUT_LAYER,1);
 		il.setInputData(im);
 		
 		// one node output layer
 		double[][] odata = new double[][] {{0}};
-		NNetPerceptron om = new NNetPerceptron(odata);
+		NNetMatrix om = new NNetMatrix(odata);
 		Layer ol = new Layer(LayerType.OUTPUT_LAYER,1);
 		ol.setExpectedData(om);
 		
@@ -59,7 +59,7 @@ class TestLayer {
 		ol.init();
 		
 		double[][] wdata = new double[][] {{0.5}};
-		NNetPerceptron w1 = new NNetPerceptron(wdata);
+		NNetMatrix w1 = new NNetMatrix(wdata);
 		ol.setWeight(w1);
 
 
@@ -78,13 +78,13 @@ class TestLayer {
 	void testHiddenLayer() throws NNetInvalidMatrixOp {
 		// One row batch input layer
 		double[][] idata = new double[][] {{1}};
-		NNetPerceptron im = new NNetPerceptron(idata);
+		NNetMatrix im = new NNetMatrix(idata);
 		Layer il = new Layer(LayerType.INPUT_LAYER,1);
 		il.setInputData(im);
 		
 		// one node output layer
 		double[][] odata = new double[][] {{0}};
-		NNetPerceptron om = new NNetPerceptron(odata);
+		NNetMatrix om = new NNetMatrix(odata);
 		Layer ol = new Layer(LayerType.OUTPUT_LAYER,1);
 		ol.setExpectedData(om);
 

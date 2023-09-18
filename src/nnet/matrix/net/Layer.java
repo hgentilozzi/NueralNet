@@ -1,17 +1,17 @@
 package nnet.matrix.net;
 
 import nnet.exception.NNetInvalidMatrixOp;
-import nnet.matrix.NNetPerceptron;
+import nnet.matrix.NNetMatrix;
 import nnet.matrix.acvt.ActivationFunction;
 
 public class Layer {
-	private NNetPerceptron hValues = null;
-	private NNetPerceptron aValues = null;
-	private NNetPerceptron tValues = null;    // target values only for last layer
-	private NNetPerceptron hGradient = null;
-	private NNetPerceptron aGradient = null;
-	private NNetPerceptron weights = null;
-	private NNetPerceptron wGradient = null;
+	private NNetMatrix hValues = null;
+	private NNetMatrix aValues = null;
+	private NNetMatrix tValues = null;    // target values only for last layer
+	private NNetMatrix hGradient = null;
+	private NNetMatrix aGradient = null;
+	private NNetMatrix weights = null;
+	private NNetMatrix wGradient = null;
 	private ActivationFunction actvFunc = null;
 	private Layer inputLayer = null;
 	private Layer outputLayer = null;
@@ -30,13 +30,13 @@ public class Layer {
 		this.actvFunc = actvFunc;
 	}
 	
-	public void setInputData(NNetPerceptron batch) {
+	public void setInputData(NNetMatrix batch) {
 		
 		batchSize = batch.getRows();		
 		hValues = aValues = batch;		
 	}
 	
-	public void setExpectedData(NNetPerceptron exptectedResults) {		
+	public void setExpectedData(NNetMatrix exptectedResults) {		
 		tValues = exptectedResults;
 	}
 	
@@ -61,10 +61,10 @@ public class Layer {
 		case INPUT_LAYER:
 			break;
 		case OUTPUT_LAYER:
-			weights = NNetPerceptron.createRandomMatrix(inputLayer.getNumNodes(),this.getNumNodes()) ;
+			weights = NNetMatrix.createRandomMatrix(inputLayer.getNumNodes(),this.getNumNodes()) ;
 			break;
 		case HIDDEN_LAYER:
-			weights = NNetPerceptron.createRandomMatrix(inputLayer.getNumNodes(),this.getNumNodes()) ;
+			weights = NNetMatrix.createRandomMatrix(inputLayer.getNumNodes(),this.getNumNodes()) ;
 			break;
 		}
 	}
@@ -86,7 +86,7 @@ public class Layer {
 
 		//outputLayer.weights.print("ol_hv");
 
-		if (actvFunc!=null)
+		if (actvFunc!=null && outputLayer.isHiddenLayer())
 			outputLayer.aValues = outputLayer.hValues.getActivation(actvFunc);
 		else
 			outputLayer.aValues = outputLayer.hValues;	
@@ -112,22 +112,32 @@ public class Layer {
 	}
 	
 	/**
-	 * The loss function for output layer else zero
+	 * The loss function for output layer else zero, Use mean squared error
 	 * @return
 	 */
 	public double getLoss() {
-		return (tValues==null || aValues==null)? 0 : hValues.subtract(tValues).sum();
+		
+		double ret = 0;
+		if (isOutputLayer()) {
+			double sumsqrs = hValues.subtract(tValues).square().sum();
+			ret = 1.0 / ((hValues.getRows()*hValues.getCols()) * sumsqrs);
+		}
+			
+		return ret;
 	}
 	
 	/**
 	 * Set weights externally. Used for unit testing only
 	 * @param weights
 	 */
-	public void setWeight(NNetPerceptron weights) {
+	public void setWeight(NNetMatrix weights) {
 		this.weights = weights;
 	}
 	
-	
+	public NNetMatrix getWeights() {
+		return weights;
+	}
+
 	public int getBatchSize() {
 		return batchSize;
 	}
@@ -136,8 +146,20 @@ public class Layer {
 		return numNodes;
 	}
 	
-	public NNetPerceptron getOutputValues() {
+	public NNetMatrix getOutputValues() {
 		return aValues;
+	}
+	
+	public  boolean isInputLayer() {
+		return  layerType ==  LayerType.INPUT_LAYER;
+	}
+	
+	public  boolean isOutputLayer() {
+		return  layerType ==  LayerType.OUTPUT_LAYER;
+	}
+	
+	public  boolean isHiddenLayer() {
+		return  layerType ==  LayerType.HIDDEN_LAYER;
 	}
 	
 
