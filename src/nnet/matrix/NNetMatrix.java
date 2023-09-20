@@ -34,11 +34,11 @@ public class NNetMatrix extends Matrix {
 		return ret;
 	}
 	
-	public NNetMatrix getActivation(ActivationFunction af) {
+	public NNetMatrix getActivation(ActivationFunction af, double bias) {
 		NNetMatrix ret = new NNetMatrix(rows,cols);
 		for (int r=0;r<rows;r++)
 			for (int c=0;c<cols;c++)
-				ret.data[r][c] = af.f(data[r][c]);
+				ret.data[r][c] = af.f(data[r][c])+bias;
 		
 		return ret;
 	}

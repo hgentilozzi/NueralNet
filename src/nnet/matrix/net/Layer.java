@@ -1,5 +1,7 @@
 package nnet.matrix.net;
 
+import java.util.concurrent.ThreadLocalRandom;
+
 import nnet.exception.NNetInvalidMatrixOp;
 import nnet.matrix.NNetMatrix;
 import nnet.matrix.acvt.ActivationFunction;
@@ -17,6 +19,7 @@ public class Layer {
 	private Layer outputLayer = null;
 	private int batchSize;
 	private int numNodes;
+	private double bias;
 	
 	private LayerType layerType; 
 
@@ -28,6 +31,7 @@ public class Layer {
 		this.layerType = layerType;
 		this.numNodes = numNodes;
 		this.actvFunc = actvFunc;
+		this.bias = ThreadLocalRandom.current().nextDouble(-10,10);
 	}
 	
 	public void setInputData(NNetMatrix batch) {
@@ -77,19 +81,28 @@ public class Layer {
 		if (layerType==LayerType.OUTPUT_LAYER)
 			return;
 
-		//outputLayer.weights.print("ol_hv");
-		
 		if (layerType==LayerType.INPUT_LAYER)
+		{
 			outputLayer.hValues = hValues.dot(outputLayer.weights);
+			hValues.print(layerType + ": hvalues");
+		}
 		else
+		{
 			outputLayer.hValues = aValues.dot(outputLayer.weights);
+			aValues.print(layerType + ": avalues");
+		}
+		
+		outputLayer.weights.print(outputLayer.layerType + ": weights");
+		outputLayer.hValues.print(outputLayer.layerType + ": hvalues");
 
-		//outputLayer.weights.print("ol_hv");
-
-		if (actvFunc!=null && outputLayer.isHiddenLayer())
-			outputLayer.aValues = outputLayer.hValues.getActivation(actvFunc);
+		if (actvFunc!=null)
+			outputLayer.aValues = outputLayer.hValues.getActivation(actvFunc,bias);
 		else
 			outputLayer.aValues = outputLayer.hValues;	
+
+		outputLayer.aValues.print(outputLayer.layerType + ": avalues");
+
+
 	}
 	
 	public void backPropigation() throws NNetInvalidMatrixOp {

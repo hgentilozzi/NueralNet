@@ -1,13 +1,12 @@
 package nnet.matrix.data;
 
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import nnet.matrix.*;
+import nnet.matrix.NNetMatrix;
 
 /**
  * A batch based on a set of arrays
@@ -21,21 +20,17 @@ public class NNetBatchDataFile implements NnetBatchDataIntf {
 	private String fileName;
 	private String nextLine;
 
-	public NNetBatchDataFile(String fileName) throws IOException {
+	public NNetBatchDataFile(String fileName)  {
 		this.error = "";
 		this.fileName = fileName;
 		this.reader = null;
 		this.nextLine = null;
-		
-		// Open the file
-		reader = new BufferedReader(new FileReader(fileName));
-		
-		// The first line is: "HEADER:", batch size,num input nodes, num output node
-		String hdrline = reader.readLine();
-		if (hdrline==null || !hdrline.startsWith("HEADER:")) {
+	
+		try {
+			reset();
+		} catch (Exception e) {
 			closeReader();
-			reader = null;
-			error = "First line of input file does not begin with \"HEADER:\"";
+			error="Failed to initialize. Error=" + e.getMessage();
 		}
 			
 	}
@@ -46,6 +41,18 @@ public class NNetBatchDataFile implements NnetBatchDataIntf {
 				reader.close();
 			} catch (IOException e) {
 			}
+		reader = null;
+	}
+	
+	/**
+	 * Read the next line from the file. Skip comment lines
+	 * @return - next line from file
+	 * @throws Exception
+	 */
+	private String nextLine() throws Exception {
+		String nl=null;
+		while ((nl=reader.readLine())!=null && nl.startsWith("#"));
+		return nl;
 	}
 	
 	@Override
@@ -57,7 +64,7 @@ public class NNetBatchDataFile implements NnetBatchDataIntf {
 		reader = new BufferedReader(new FileReader(fileName));
 		
 		// The first line is: "HEADER:", batch size,num input nodes, num output node
-		String hdrline = reader.readLine();
+		String hdrline = nextLine();
 		if (hdrline==null || !hdrline.startsWith("HEADER:")) {
 			closeReader();
 			reader = null;
@@ -72,6 +79,7 @@ public class NNetBatchDataFile implements NnetBatchDataIntf {
 				closeReader();
 				reader = null;
 				error = "The header line is ill-formed";
+				return;
 			}
 			else
 			{
@@ -81,7 +89,7 @@ public class NNetBatchDataFile implements NnetBatchDataIntf {
 			}
 			
 			// pre-read the first line of data
-			nextLine = reader.readLine();
+			nextLine = nextLine();
 		}
 	}
 
@@ -102,15 +110,16 @@ public class NNetBatchDataFile implements NnetBatchDataIntf {
 		batchlines.add(nextLine);
 		int i=1;
 		String l;
-		// Read up to batchsize of rows
-		while ((l=reader.readLine())!=null){
+		// Read up to batch size of rows
+		while (i++<batchSize && (l=nextLine())!=null){
 			batchlines.add(l);
 			if (++i>batchSize)
 				break;
 		}
 		
 		// buffer the next line for eof checking
-		nextLine = reader.readLine();
+		if (!atEof())
+			nextLine = nextLine();
 		
 		// create the NNetMatrix for input and output
 		double[][] indate = new double[batchlines.size()][numInNodes];
@@ -122,7 +131,7 @@ public class NNetBatchDataFile implements NnetBatchDataIntf {
 			if (parts.length!=(numInNodes+numOutNodes)) {
 				closeReader();
 				reader = null;
-				error = "The data line is ill-formed: line=" +l;
+				error = "The data line is ill-formed: line=" + bstr;
 				throw new Exception(error);
 			}
 			
@@ -132,9 +141,11 @@ public class NNetBatchDataFile implements NnetBatchDataIntf {
 			for (int col=0;col<numOutNodes;col++)
 				outdate[row][col] = Double.parseDouble(parts[numInNodes+col]);
 
-			ret = new NNetBatch(batchlines.size(),new NNetMatrix(indate), new NNetMatrix(outdate));
+			row++;
 			
 		}
+
+		ret = new NNetBatch(batchlines.size(),new NNetMatrix(indate), new NNetMatrix(outdate));
 
 		return ret;
 	}
@@ -144,13 +155,25 @@ public class NNetBatchDataFile implements NnetBatchDataIntf {
 		// Reader failed to open Error already set
 		if (reader==null)
 			return false;
-
+		
 		return true;
 	}
 
 	@Override
 	public String getError() {
 		return error;
+	}
+
+	public int getBatchSize() {
+		return batchSize;
+	}
+
+	public int getNumInNodes() {
+		return numInNodes;
+	}
+
+	public int getNumOutNodes() {
+		return numOutNodes;
 	}
 
 

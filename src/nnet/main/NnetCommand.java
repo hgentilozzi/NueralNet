@@ -3,27 +3,25 @@ package nnet.main;
 import nnet.exception.*;
 import nnet.matrix.NNetMatrix;
 import nnet.matrix.acvt.*;
-import nnet.matrix.data.NNetBatch;
-import nnet.matrix.data.NNetBatchDataArray;
+import nnet.matrix.data.*;
 import nnet.matrix.net.*;
 
 public class NnetCommand  {
 
 	public static void main(String[] args) throws NNetInvalidMatrixOp {
-		double[][] i_data = new double[][] {{0.9},{0.8},{0.7},{0.6},{0.4},{0.3},{0.2},{0.1},};				
-		double[][] o_data = new double[][] {{0.3},{0.3},{0.3},{0.3},{0.9},{0.9},{0.9},{0.9},};				
-		NNetBatchDataArray bdata = new NNetBatchDataArray(4, i_data, o_data);
+		NNetBatchDataFile batchDB = new NNetBatchDataFile("data/OneRowBatchDB.csv");	
+		
 		
 		try {
-			Network n1 = new Network(new ActivationFunctionReLU(),1,2,1);
-			n1.setDebugLevel(0);
+			Network n1 = new Network(new ActivationFunctionSigmoid(),3,2,1);
+			n1.setDebugLevel(1);
 			
-			n1.train(bdata, 1000);
+			n1.train(batchDB, 1);
 			
 			//System.out.println("Training stats: " + n1.getStats().toString());
 			
-			bdata.reset();
-			NNetBatch b = bdata.nextBatch();
+			batchDB.reset();
+			NNetBatch b = batchDB.nextBatch();
 			
 			NNetMatrix results = n1.predict(b.inData());
 			
@@ -31,9 +29,8 @@ public class NnetCommand  {
 			b.expectedResults().print("Expected");
 			
 			
-		} catch (NNetInvalidNetwork e) {
+		} catch (Exception e) {
 			System.err.println(e);
-			return;
 		}
 		
 		

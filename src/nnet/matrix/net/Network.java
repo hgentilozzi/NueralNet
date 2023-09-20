@@ -28,9 +28,10 @@ public class Network {
 
 		// Create the layers
 		layers = new ArrayList<Layer>();
-		layers.add(new Layer(LayerType.INPUT_LAYER,1,acvtFunc));
-		layers.add(new Layer(LayerType.HIDDEN_LAYER,2,acvtFunc));
-		layers.add(new Layer(LayerType.OUTPUT_LAYER,1));
+		layers.add(new Layer(LayerType.INPUT_LAYER,layersizes[0],acvtFunc));
+		for (int nl = 1; nl < numLayers-1; nl++)
+			layers.add(new Layer(LayerType.HIDDEN_LAYER,layersizes[nl],acvtFunc));
+		layers.add(new Layer(LayerType.OUTPUT_LAYER,layersizes[numLayers-1]));
 
 		// Wire them together
 		for (int i=0;i<layers.size();i++)
@@ -65,9 +66,9 @@ public class Network {
 	 * Train using an input stream of and train each batch
 	 * @param batchData  - all input data and expected results
 	 * @param iterations
-	 * @throws NNetInvalidMatrixOp
+	 * @throws Exception 
 	 */
-	public void train(NnetBatchDataIntf batchData, int iterations) throws NNetInvalidMatrixOp 
+	public void train(NnetBatchDataIntf batchData, int iterations) throws Exception 
 	{
 		stats.clear();
 		for (int iter=0;iter<iterations;iter++)
@@ -98,6 +99,7 @@ public class Network {
 
 		for (int iter=0;iter<iterations;iter++)
 		{
+			System.out.println("Network: FeedForward");
 			for (int i=0;i<layers.size();i++)
 				layers.get(i).feedForward();
 
@@ -105,6 +107,7 @@ public class Network {
 				layers.get(i).backPropigation();	
 
 			double loss = getLoss();
+			System.out.println("\nNetwork: Backprop loss=" + loss);
 			if (tolerance>0 && loss>-tolerance && loss < tolerance)
 					break;
 			
@@ -113,8 +116,8 @@ public class Network {
 				outputLayer.getOutputValues().print("OL->avalues");
 				outputLayer.getInputLayer().getWeights().print("OL->weights");
 			}
-			System.out.println(stats.totalIterations + "," + loss);
 
+			System.out.println("\nNetwork: end iteration");
 
 			stats.totalIterations++; 
 
