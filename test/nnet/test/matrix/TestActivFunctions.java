@@ -11,7 +11,7 @@ import nnet.matrix.net.*;
 
 class TestActivFunctions {
 	private ActivationFunctionReLU afReLU = new ActivationFunctionReLU();
-	private ActivationFunctionTanh afStep = new ActivationFunctionTanh();
+	private ActivationFunctionTanh afTanh = new ActivationFunctionTanh();
 	private ActivationFunctionSigmoid afSigm = new ActivationFunctionSigmoid();
 
 	@Test
@@ -23,9 +23,9 @@ class TestActivFunctions {
 
 	@Test
 	void testStep() {
-		assertTrue(afStep.f(-1)==0);
-		assertTrue(afStep.f(0)==0);
-		assertTrue(afStep.f(2.6)==1);
+		assertEquals(-0.7615941559557649,afTanh.f(-1));
+		assertEquals(0,afTanh.f(0));
+		assertEquals(0.7615941559557649,afTanh.f(1));
 	}
 
 
