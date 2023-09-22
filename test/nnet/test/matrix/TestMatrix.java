@@ -196,11 +196,26 @@ class TestMatrix {
 		assertEquals(1,x.get(0,0));
 		assertEquals(4,x.get(0,1));
 		assertEquals(9,x.get(1,0));
-		assertEquals(16,x.get(1,1));
+		assertEquals(16,x.get(1,1));	
+	}
+	
+	@Test
+	void testAbsolute() {
+		Matrix x = new Matrix(2,2);
+		x.set(0, 0, -2);
+		x.set(0, 1, -1);
+		x.set(1, 0, 0);
+		x.set(1, 1, 1);
+	
+		x = x.absoluteValue();
+		
+		assertEquals(2,x.get(0,0));
+		assertEquals(1,x.get(0,1));
+		assertEquals(0,x.get(1,0));
+		assertEquals(1,x.get(1,1));
 
 		
 	}
-	
 	@Test
 	void testCreateIdentMatrix() {
 		// Square matrix

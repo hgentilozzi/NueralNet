@@ -1,0 +1,7 @@
+# Uses 2x2 array expect output {1,0} if 1st row dominant else {0,1)
+# Input nodes = 4, output nodes = 2              
+0.9, 0.1, 0.0, 0.0,  1,0
+0.1, 0.8, 0.0, 0.0,  1,0
+0.0, 0.0, 0.8, 0.2,  0,1
+0.0, 0.0, 0.2, 0.7,  0,1
+

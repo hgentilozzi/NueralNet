@@ -109,6 +109,9 @@ public class NNetMatrix extends Matrix {
 		return (NNetMatrix) Matrix.createIdentMatrix(NNetMatrix.class,rows,cols);
 	}
 	
+	public Matrix absoluteValue() {
+		return (NNetMatrix) Matrix.absoluteValue(this);
+	}
 	/**
 	 * Return a select row of the matrix
 	 * @param r
@@ -151,6 +154,26 @@ public class NNetMatrix extends Matrix {
 		ret.randomize(minv,maxv);
 		return ret;
 	}
+
+	/**
+	 * Add a bias to the input matrix
+	 * @param bias - one row vector. Apply the same bias to all rows of this matrix
+	 * @return
+	 */
+	public NNetMatrix bias(NNetMatrix bias) {
+		
+		if (bias==null)
+			return this;
+		
+		NNetMatrix ret = new NNetMatrix(rows,cols);
+
+		for (int r=0;r<rows;r++)
+			for (int c=0;c<cols;c++)
+				ret.data[r][c] = data[r][c] + bias.data[0][c];
+		
+		return ret;
+	}
+
 	
 
 

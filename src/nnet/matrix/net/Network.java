@@ -67,6 +67,11 @@ public class Network {
 		this.debugLevel = debugLevel;
 		layers.stream().forEach(l -> l.setDebugLevel(debugLevel));
 	}
+	
+	public void enableBias() {
+		for (int nl = 1; nl < numLayers; nl++) 
+			layers.get(nl).enableBias();
+	}
 
 	/**
 	 * Train using an input stream of and train each batch
@@ -95,7 +100,6 @@ public class Network {
 		inputLayer.setInputData(iData);
 		outputLayer.setExpectedData(oData);
 
-		System.out.println("Network: FeedForward");
 		for (int i=0;i<layers.size();i++)
 			layers.get(i).feedForward();
 

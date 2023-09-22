@@ -2,15 +2,23 @@ package nnet.test.matrix;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import nnet.exception.NNetInvalidMatrixOp;
 import nnet.matrix.NNetMatrix;
+import nnet.matrix.acvt.ActivationFunction;
 import nnet.matrix.net.*;
 
 class TestLayer {
-	//private ActivationFunctionReLU afReLU = new ActivationFunctionReLU();
-
+	
+	@BeforeAll
+	static void init() {
+		NNetParameters.getInstance().setActivationFunction(ActivationFunction.RELU);
+		NNetParameters.getInstance().setBatchSize(1);
+		NNetParameters.getInstance().setLearningRate(0.001);		
+	}
+	
 	@Test
 	void testInputLayer() throws NNetInvalidMatrixOp {
 		// One row batch
@@ -67,6 +75,7 @@ class TestLayer {
 		assertEquals(1, il.getNumNodes());
 		
 		il.feedForward();
+		ol.feedForward();
 		assertArrayEquals((new double[][] {{0.5}})[0],ol.getOutputValues().getData()[0]);
 				
 		ol.backPropigation();
@@ -90,7 +99,7 @@ class TestLayer {
 
 		
 		// two node hidden layer
-		Layer hl = new Layer(LayerType.HIDDEN_LAYER,2);
+		Layer hl = new Layer(LayerType.HIDDEN_LAYER,2,NNetParameters.getInstance().getActivationFunction());
 		ol.setExpectedData(om);
 
 		

@@ -124,6 +124,10 @@ public class Matrix {
 		return Matrix.squareElement(this);
 	}
 
+	public Matrix absoluteValue()  {
+		return Matrix.absoluteValue(this);
+	}
+
 	public void zero()
 	{
 		for (int r=0;r<rows;r++)
@@ -296,7 +300,7 @@ public class Matrix {
 		for (int r=0;r<ret.rows;r++)
 			for (int c=0;c<ret.cols;c++)
 			{
-				ret.data[r][c] += a.data[r][c] - b.data[r][c];
+				ret.data[r][c] = a.data[r][c] - b.data[r][c];
 			}
 	
 		
@@ -343,7 +347,23 @@ public class Matrix {
 		return ret;
 	}
 
+	/**
+	 * Return a matrix with the absolute values of the input matrix
+	 * @param nNetMatrix
+	 * @return
+	 */
+	public static Matrix absoluteValue(Matrix a) {
+		Matrix ret = newInstance(a.getClass(),a.getRows(),a.getCols());
+		
+		for (int r=0;r<ret.rows;r++)
+			for (int c=0;c<ret.cols;c++)
+			{
+				ret.data[r][c] = Math.abs(a.data[r][c]);
+			}
+			
+		return ret;	
 	
+	}	
 
 	/**
 	 * Create a randomized matrix of the requested size
@@ -390,5 +410,6 @@ public class Matrix {
 		}
 		return ret;
 	}
+
 
 }
