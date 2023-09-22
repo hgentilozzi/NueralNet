@@ -47,7 +47,7 @@ class TestLayer {
 		il.setInputData(im);
 		
 		// one node output layer
-		double[][] odata = new double[][] {{0}};
+		double[][] odata = new double[][] {{1}};
 		NNetMatrix om = new NNetMatrix(odata);
 		Layer ol = new Layer(LayerType.OUTPUT_LAYER,1);
 		ol.setExpectedData(om);
@@ -116,21 +116,6 @@ class TestLayer {
 		il.backPropigation();
 
 	}
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
 	
 	
 	

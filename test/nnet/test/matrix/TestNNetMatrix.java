@@ -7,7 +7,65 @@ import org.junit.jupiter.api.Test;
 import nnet.exception.NNetInvalidMatrixOp;
 import nnet.matrix.NNetMatrix;
 
-class TestPerceptron {
+class TestNNetMatrix {
+	
+	@Test
+	void testScale() {
+		NNetMatrix x = new NNetMatrix(2,2);
+		
+		x.set(0, 0, 1);
+		x.set(0, 1, 2);
+		x.set(1, 0, 3);
+		x.set(1, 1, 4);
+		
+		NNetMatrix z=null;
+		z = x.scale(3);
+		
+		assertEquals(3,z.get(0,0));
+		assertEquals(6,z.get(0,1));
+		assertEquals(9,z.get(1,0));
+		assertEquals(12,z.get(1,1));
+		
+	}
+
+	@Test
+	void testShift() {
+		NNetMatrix x = new NNetMatrix(2,2);
+		
+		x.set(0, 0, 1);
+		x.set(0, 1, 2);
+		x.set(1, 0, 3);
+		x.set(1, 1, 4);
+		
+		NNetMatrix z=null;
+		z = x.shift(3);
+		
+		assertEquals(4,z.get(0,0));
+		assertEquals(5,z.get(0,1));
+		assertEquals(6,z.get(1,0));
+		assertEquals(7,z.get(1,1));
+		
+	}
+	
+	@Test
+	void testXlate() {
+		NNetMatrix x = new NNetMatrix(2,2);
+		
+		x.set(0, 0, 1);
+		x.set(0, 1, 2);
+		x.set(1, 0, 3);
+		x.set(1, 1, 4);
+		
+		NNetMatrix z=null;
+		z = x.xlate(3,5);
+		
+		assertEquals(8,z.get(0,0));
+		assertEquals(11,z.get(0,1));
+		assertEquals(14,z.get(1,0));
+		assertEquals(17,z.get(1,1));
+		
+	}
+
 
 	@Test
 	void testMultuplySqrMatic() {

@@ -16,10 +16,12 @@ public class Network {
 	private Layer outputLayer;
 	private TrainingStats stats;
 	private int debugLevel;
+	private ActivationFunction acvtFunc;
 	
 
-	public Network(ActivationFunction acvtFunc,int ... layersizes) throws NNetInvalidNetwork {
+	public Network(int ... layersizes) throws NNetInvalidNetwork {
 		this.numLayers = layersizes.length;
+		this.acvtFunc = NNetParameters.getInstance().getActivationFunction();
 		
 		// Must have a least 2 layers, input, hidden, and output
 		if (numLayers<2)
@@ -28,9 +30,12 @@ public class Network {
 
 		// Create the layers
 		layers = new ArrayList<Layer>();
+		
 		layers.add(new Layer(LayerType.INPUT_LAYER,layersizes[0],acvtFunc));
+		
 		for (int nl = 1; nl < numLayers-1; nl++)
 			layers.add(new Layer(LayerType.HIDDEN_LAYER,layersizes[nl],acvtFunc));
+		
 		layers.add(new Layer(LayerType.OUTPUT_LAYER,layersizes[numLayers-1]));
 
 		// Wire them together
@@ -60,6 +65,7 @@ public class Network {
 
 	public void setDebugLevel(int debugLevel) {
 		this.debugLevel = debugLevel;
+		layers.stream().forEach(l -> l.setDebugLevel(debugLevel));
 	}
 
 	/**
@@ -75,54 +81,34 @@ public class Network {
 		{
 			batchData.reset();
 			while (!batchData.atEof()) {
-				NNetBatch b = batchData.nextBatch();
-				train(b.inData(),b.expectedResults(),1,0);
+				NNetBatch b = batchData.nextBatch(1);
+				train(b.inData(),b.expectedResults());
 			}
 		}
 		stats.finalLoss = getLoss();
 		stats.finalResult = outputLayer.getOutputValues();
 	}
-
-	public void train(NNetMatrix iData, NNetMatrix oData, int iterations) throws NNetInvalidMatrixOp 
-	{
-		stats.clear();
-		train(iData,oData,iterations,0);
-		stats.finalLoss = getLoss();
-		stats.finalResult = outputLayer.getOutputValues();
-	}
 	
-	public void train(NNetMatrix iData, NNetMatrix oData, int iterations,double tolerance) throws NNetInvalidMatrixOp 
+	public void train(NNetMatrix iData, NNetMatrix oData) throws NNetInvalidMatrixOp 
 	{
 		
 		inputLayer.setInputData(iData);
 		outputLayer.setExpectedData(oData);
 
-		for (int iter=0;iter<iterations;iter++)
+		System.out.println("Network: FeedForward");
+		for (int i=0;i<layers.size();i++)
+			layers.get(i).feedForward();
+
+		for (int i=layers.size()-1;i>=0;i--)
+			layers.get(i).backPropigation();	
+				
+		if (debugLevel>0)
 		{
-			System.out.println("Network: FeedForward");
-			for (int i=0;i<layers.size();i++)
-				layers.get(i).feedForward();
-
-			for (int i=layers.size()-1;i>=0;i--)
-				layers.get(i).backPropigation();	
-
-			double loss = getLoss();
-			System.out.println("\nNetwork: Backprop loss=" + loss);
-			if (tolerance>0 && loss>-tolerance && loss < tolerance)
-					break;
-			
-			if (debugLevel>0)
-			{
-				outputLayer.getOutputValues().print("OL->avalues");
-				outputLayer.getInputLayer().getWeights().print("OL->weights");
-			}
-
-			System.out.println("\nNetwork: end iteration");
-
-			stats.totalIterations++; 
-
+			outputLayer.getOutputValues().print("OL->avalues");
+			outputLayer.getWeights().print("OL->weights");
 		}
 
+		stats.totalIterations++; 
 
 	}
 	

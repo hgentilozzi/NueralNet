@@ -8,15 +8,13 @@ import nnet.matrix.*;
  * A batch based on a set of arrays
  */
 public class NNetBatchDataArray implements NnetBatchDataIntf {
-	private int batchSize;
 	private double[][] inputData;
 	private double[][] expectedResults;
 	private int currIdx;
 	private String error;
 
 
-	public NNetBatchDataArray(int batchSize, double[][] inputData, double[][] expectedResukts) {
-		this.batchSize = batchSize;
+	public NNetBatchDataArray(double[][] inputData, double[][] expectedResukts) {
 		this.inputData = inputData;
 		this.expectedResults = expectedResukts;
 		this.error = "";
@@ -35,7 +33,7 @@ public class NNetBatchDataArray implements NnetBatchDataIntf {
 	}
 
 	@Override
-	public NNetBatch nextBatch() {
+	public NNetBatch nextBatch(int batchSize) {
 		NNetBatch ret = null;
 		
 		int remaining = inputData.length-currIdx;

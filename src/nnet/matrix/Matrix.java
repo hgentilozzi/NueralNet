@@ -77,11 +77,29 @@ public class Matrix {
 		return ret;
 	}
 
-	public Matrix scale(double scaler) {
+	public Matrix scale(double m) {
 		Matrix ret = new Matrix(rows,cols);
 		for (int r=0;r<rows;r++)
 			for (int c=0;c<cols;c++)
-				ret.data[r][c] = data[r][c]*scaler;
+				ret.data[r][c] = data[r][c]*m;
+		
+		return ret;
+	}
+
+	public Matrix shift(double b) {
+		Matrix ret = new Matrix(rows,cols);
+		for (int r=0;r<rows;r++)
+			for (int c=0;c<cols;c++)
+				ret.data[r][c] = data[r][c]+b;
+		
+		return ret;
+	}
+
+	public Matrix xlate(double m,double b) {
+		Matrix ret = new Matrix(rows,cols);
+		for (int r=0;r<rows;r++)
+			for (int c=0;c<cols;c++)
+				ret.data[r][c] = (data[r][c]*m)+b;
 		
 		return ret;
 	}
@@ -122,12 +140,17 @@ public class Matrix {
 		
 		return ret;
 	}
-	
+
 	public void randomize()
+	{
+		randomize(-1,1);
+	}
+	
+	public void randomize(double minv, double maxv)
 	{
 		for (int r=0;r<rows;r++)
 			for (int c=0;c<cols;c++)
-				data[r][c] = ThreadLocalRandom.current().nextDouble(-1,1);		
+				data[r][c] = ThreadLocalRandom.current().nextDouble(minv,maxv);		
 	}
 	
 	/**
@@ -320,6 +343,7 @@ public class Matrix {
 		return ret;
 	}
 
+	
 
 	/**
 	 * Create a randomized matrix of the requested size
@@ -328,6 +352,12 @@ public class Matrix {
 	public static Matrix createRandomMatrix(int rows, int cols)  {
 		Matrix ret = newInstance(Matrix.class,rows,cols);
 		ret.randomize();
+		return ret;
+	}
+
+	public static Matrix createRandomMatrix(int rows, int cols, double minv, double maxv)  {
+		Matrix ret = newInstance(Matrix.class,rows,cols);
+		ret.randomize(minv,maxv);
 		return ret;
 	}
 

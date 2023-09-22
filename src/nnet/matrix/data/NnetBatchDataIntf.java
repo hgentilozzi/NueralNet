@@ -6,6 +6,7 @@ public interface NnetBatchDataIntf {
 	public String getError();
 	public void reset() throws Exception;
 	public boolean atEof();
-	public NNetBatch nextBatch() throws Exception;
+	
+	public NNetBatch nextBatch(int batchSize) throws Exception;
 
 }

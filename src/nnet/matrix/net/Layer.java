@@ -1,7 +1,5 @@
 package nnet.matrix.net;
 
-import java.util.concurrent.ThreadLocalRandom;
-
 import nnet.exception.NNetInvalidMatrixOp;
 import nnet.matrix.NNetMatrix;
 import nnet.matrix.acvt.ActivationFunction;
@@ -14,12 +12,13 @@ public class Layer {
 	private NNetMatrix aGradient = null;
 	private NNetMatrix weights = null;
 	private NNetMatrix wGradient = null;
+	private NNetMatrix bias = null;
 	private ActivationFunction actvFunc = null;
 	private Layer inputLayer = null;
 	private Layer outputLayer = null;
 	private int batchSize;
 	private int numNodes;
-	private double bias;
+	private int debugLevel = 0;
 	
 	private LayerType layerType; 
 
@@ -31,7 +30,6 @@ public class Layer {
 		this.layerType = layerType;
 		this.numNodes = numNodes;
 		this.actvFunc = actvFunc;
-		this.bias = ThreadLocalRandom.current().nextDouble(-10,10);
 	}
 	
 	public void setInputData(NNetMatrix batch) {
@@ -59,6 +57,14 @@ public class Layer {
 	public void setOutputLayer(Layer outputLayer) {
 		this.outputLayer = outputLayer;
 	}
+	
+	public int getDebugLevel() {
+		return debugLevel;
+	}
+
+	public void setDebugLevel(int debugLevel) {
+		this.debugLevel = debugLevel;
+	}
 
 	public void init() {
 		switch (layerType) {
@@ -66,9 +72,11 @@ public class Layer {
 			break;
 		case OUTPUT_LAYER:
 			weights = NNetMatrix.createRandomMatrix(inputLayer.getNumNodes(),this.getNumNodes()) ;
+			bias = NNetMatrix.createRandomMatrix(inputLayer.getNumNodes(),this.getNumNodes(),-30,+30) ;
 			break;
 		case HIDDEN_LAYER:
 			weights = NNetMatrix.createRandomMatrix(inputLayer.getNumNodes(),this.getNumNodes()) ;
+			bias = NNetMatrix.createRandomMatrix(inputLayer.getNumNodes(),this.getNumNodes(),1,+30) ;
 			break;
 		}
 	}
@@ -79,29 +87,51 @@ public class Layer {
 	 */
 	public void feedForward() throws NNetInvalidMatrixOp {
 		if (layerType==LayerType.OUTPUT_LAYER)
-			return;
+		{
+			if (debugLevel>1)
+			{
+				displayDebugInfo();
+				return;
+			}
+		}
 
 		if (layerType==LayerType.INPUT_LAYER)
 		{
-			outputLayer.hValues = hValues.dot(outputLayer.weights);
-			hValues.print(layerType + ": hvalues");
+			outputLayer.hValues = hValues.dot(outputLayer.weights).add(outputLayer.bias);
 		}
 		else
 		{
-			outputLayer.hValues = aValues.dot(outputLayer.weights);
-			aValues.print(layerType + ": avalues");
+			outputLayer.hValues = aValues.dot(outputLayer.weights).add(outputLayer.bias);
+			bias = bias.subtract(bias.scale(NNetParameters.getInstance().getLearningRate()));
 		}
 		
-		outputLayer.weights.print(outputLayer.layerType + ": weights");
-		outputLayer.hValues.print(outputLayer.layerType + ": hvalues");
+		if (debugLevel>1)
+			displayDebugInfo();
 
 		if (actvFunc!=null)
-			outputLayer.aValues = outputLayer.hValues.getActivation(actvFunc,bias);
+			outputLayer.aValues = outputLayer.hValues.getActivation(actvFunc);
 		else
 			outputLayer.aValues = outputLayer.hValues;	
 
-		outputLayer.aValues.print(outputLayer.layerType + ": avalues");
-
+	}
+	
+	private void displayDebugInfo() {
+		if (debugLevel>1)
+		{
+			hValues.print(layerType + ": hvalues");
+			
+			if (!isInputLayer()) {
+				aValues.print(layerType + ": avalues");
+				weights.print(layerType + ": weights");
+			}
+			
+			if (bias!=null)
+				bias.print(layerType + ": bias");
+			
+			if (isOutputLayer()) {
+				System.out.println("Loss=" + getLoss());
+			}
+		}
 
 	}
 	

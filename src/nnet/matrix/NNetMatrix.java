@@ -34,11 +34,13 @@ public class NNetMatrix extends Matrix {
 		return ret;
 	}
 	
-	public NNetMatrix getActivation(ActivationFunction af, double bias) {
+	public NNetMatrix getActivation(ActivationFunction af) {
 		NNetMatrix ret = new NNetMatrix(rows,cols);
 		for (int r=0;r<rows;r++)
 			for (int c=0;c<cols;c++)
-				ret.data[r][c] = af.f(data[r][c])+bias;
+			{
+				ret.data[r][c] = af.f(data[r][c]);
+			}
 		
 		return ret;
 	}
@@ -61,6 +63,24 @@ public class NNetMatrix extends Matrix {
 		for (int r=0;r<rows;r++)
 			for (int c=0;c<cols;c++)
 				ret.data[r][c] = data[r][c]*scaler;
+		
+		return ret;
+	}
+
+	public NNetMatrix shift(double bias) {
+		NNetMatrix ret = new NNetMatrix(rows,cols);
+		for (int r=0;r<rows;r++)
+			for (int c=0;c<cols;c++)
+				ret.data[r][c] = data[r][c]+bias;
+		
+		return ret;
+	}
+
+	public NNetMatrix xlate(double m,double b) {
+		NNetMatrix ret = new NNetMatrix(rows,cols);
+		for (int r=0;r<rows;r++)
+			for (int c=0;c<cols;c++)
+				ret.data[r][c] = (data[r][c]*m)+b;
 		
 		return ret;
 	}
@@ -118,10 +138,17 @@ public class NNetMatrix extends Matrix {
 		
 		return ret;
 	}
+
 	
 	public static NNetMatrix createRandomMatrix(int rows, int cols)  {
 		NNetMatrix ret = (NNetMatrix) newInstance(NNetMatrix.class,rows,cols);
 		ret.randomize();
+		return ret;
+	}
+
+	public static NNetMatrix createRandomMatrix(int rows, int cols, double minv, double maxv)  {
+		NNetMatrix ret = (NNetMatrix) newInstance(NNetMatrix.class,rows,cols);
+		ret.randomize(minv,maxv);
 		return ret;
 	}
 	

@@ -12,7 +12,6 @@ import nnet.matrix.NNetMatrix;
  * A batch based on a set of arrays
  */
 public class NNetBatchDataFile implements NnetBatchDataIntf {
-	private int batchSize;
 	private int numInNodes;
 	private int numOutNodes;
 	private String error;
@@ -20,11 +19,13 @@ public class NNetBatchDataFile implements NnetBatchDataIntf {
 	private String fileName;
 	private String nextLine;
 
-	public NNetBatchDataFile(String fileName)  {
+	public NNetBatchDataFile(String fileName,int numInNodes,int numOutNodes)  {
 		this.error = "";
 		this.fileName = fileName;
 		this.reader = null;
 		this.nextLine = null;
+		this.numInNodes = numInNodes;
+		this.numOutNodes = numOutNodes;
 	
 		try {
 			reset();
@@ -51,7 +52,7 @@ public class NNetBatchDataFile implements NnetBatchDataIntf {
 	 */
 	private String nextLine() throws Exception {
 		String nl=null;
-		while ((nl=reader.readLine())!=null && nl.startsWith("#"));
+		while ((nl=reader.readLine())!=null && (nl.isBlank() || nl.startsWith("#")));
 		return nl;
 	}
 	
@@ -63,34 +64,8 @@ public class NNetBatchDataFile implements NnetBatchDataIntf {
 		// Open the file
 		reader = new BufferedReader(new FileReader(fileName));
 		
-		// The first line is: "HEADER:", batch size,num input nodes, num output node
-		String hdrline = nextLine();
-		if (hdrline==null || !hdrline.startsWith("HEADER:")) {
-			closeReader();
-			reader = null;
-			error = "First line of input file does not begin with \"HEADER:\"";
-		}
-		else
-		{
-			// Parse the header line
-			String[] parts = hdrline.split(",");
-			if (parts.length<4)
-			{
-				closeReader();
-				reader = null;
-				error = "The header line is ill-formed";
-				return;
-			}
-			else
-			{
-				batchSize = Integer.parseInt(parts[1]);
-				numInNodes = Integer.parseInt(parts[2]);
-				numOutNodes = Integer.parseInt(parts[3]);
-			}
-			
-			// pre-read the first line of data
-			nextLine = nextLine();
-		}
+		// pre-read the first line of data
+		nextLine = nextLine();
 	}
 
 
@@ -100,7 +75,7 @@ public class NNetBatchDataFile implements NnetBatchDataIntf {
 	}
 
 	@Override
-	public NNetBatch nextBatch() throws Exception {
+	public NNetBatch nextBatch(int batchSize) throws Exception {
 		NNetBatch ret = null;
 		List<String> batchlines = new ArrayList<String>();
 		
@@ -113,8 +88,6 @@ public class NNetBatchDataFile implements NnetBatchDataIntf {
 		// Read up to batch size of rows
 		while (i++<batchSize && (l=nextLine())!=null){
 			batchlines.add(l);
-			if (++i>batchSize)
-				break;
 		}
 		
 		// buffer the next line for eof checking
@@ -162,10 +135,6 @@ public class NNetBatchDataFile implements NnetBatchDataIntf {
 	@Override
 	public String getError() {
 		return error;
-	}
-
-	public int getBatchSize() {
-		return batchSize;
 	}
 
 	public int getNumInNodes() {

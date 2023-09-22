@@ -1,7 +1,7 @@
 # Small silly training set. student test scores
 # Data format Science Grade, Chemistry grade, Hours studies, Expected results
-# Header format - batch size, input nodes, output nodes
-HEADER:,1,3,1
+# Data format input nodes=3 output nodes=1
+
 60,80,5,82
 70,75,7,94
 50,55,10,45
