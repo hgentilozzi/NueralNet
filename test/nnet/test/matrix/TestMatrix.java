@@ -212,10 +212,25 @@ class TestMatrix {
 		assertEquals(2,x.get(0,0));
 		assertEquals(1,x.get(0,1));
 		assertEquals(0,x.get(1,0));
-		assertEquals(1,x.get(1,1));
+		assertEquals(1,x.get(1,1));	
+	}
 
+	@Test
+	void testRowColSums() {
+		Matrix x = new Matrix(2,2);
+		x.set(0, 0, -2);
+		x.set(0, 1, -1);
+		x.set(1, 0, 5);
+		x.set(1, 1, 3);
+			
+		assertEquals(-3,x.getRowSum(0));
+		assertEquals(8,x.getRowSum(1));
+		
+		assertEquals(3,x.getColumnSum(0));
+		assertEquals(2,x.getColumnSum(1));
 		
 	}
+
 	@Test
 	void testCreateIdentMatrix() {
 		// Square matrix

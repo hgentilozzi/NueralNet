@@ -186,6 +186,28 @@ public class Matrix {
 		
 		return ret;
 	}
+
+	/*
+	 * Return the sum of the given row
+	 */
+	public double getRowSum(int row) {
+		double ret = 0;
+		for (int c=0;c<cols;c++)
+			ret+= data[row][c];
+
+		return ret;
+	}
+
+	/*
+	 * Return the sum of the given column
+	 */
+	public double getColumnSum(int col) {
+		double ret = 0;
+		for (int r=0;r<rows;r++)
+			ret+= data[r][col];
+
+		return ret;
+	}
 	
 	public void print(String name)
 	{		

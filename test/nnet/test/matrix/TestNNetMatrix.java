@@ -253,11 +253,25 @@ class TestNNetMatrix {
 		assertEquals(1,x.get(0,0));
 		assertEquals(4,x.get(0,1));
 		assertEquals(9,x.get(1,0));
-		assertEquals(16,x.get(1,1));
-
-		
+		assertEquals(16,x.get(1,1));	
 	}
 	
+	@Test
+	void testSoftMax() {
+		NNetMatrix x = new NNetMatrix(2,2);
+		x.set(0, 0, 1);
+		x.set(0, 1, 2);
+		x.set(1, 0, 3);
+		x.set(1, 1, 4);
+	
+		x = x.getSoftMax();
+		
+		assertEquals(1.0/3.0,x.get(0,0));
+		assertEquals(2.0/3.0,x.get(0,1));
+		assertEquals(3.0/7.0,x.get(1,0));
+		assertEquals(4.0/7.0,x.get(1,1));	
+	}
+		
 	@Test
 	void testCreateIdentMatrix() {
 		// Square matrix

@@ -106,13 +106,14 @@ public class Network {
 		for (int i=layers.size()-1;i>=0;i--)
 			layers.get(i).backPropigation();	
 				
-		if (debugLevel>0)
+		if (debugLevel>1)
 		{
 			outputLayer.getOutputValues().print("OL->avalues");
 			outputLayer.getWeights().print("OL->weights");
 		}
 
 		stats.totalIterations++; 
+		stats.addLossResult(getLoss());
 
 	}
 	

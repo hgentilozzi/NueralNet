@@ -46,6 +46,22 @@ public class NNetMatrix extends Matrix {
 	}
 
 	
+	public NNetMatrix getSoftMax() {
+		NNetMatrix ret = new NNetMatrix(rows,cols);
+		for (int r=0;r<rows;r++)
+		{
+			double rowSum = getRowSum(r);
+			if (rowSum==0.0)
+				rowSum = 1.0;
+			
+			for (int c=0;c<cols;c++)
+				ret.data[r][c] = data[r][c] / rowSum;
+		}
+		
+		return ret;
+	}
+
+	
 	public NNetMatrix getGradient(ActivationFunction af) {
 		if (af==null)
 			return copy();

@@ -19,6 +19,7 @@ public class Layer {
 	private int batchSize;
 	private int numNodes;
 	private int debugLevel = 0;
+	private boolean useSoftMaxActivation = false;
 	
 	private LayerType layerType; 
 
@@ -67,7 +68,19 @@ public class Layer {
 	}
 	
 	public void enableBias() {
-		bias = NNetMatrix.createRandomMatrix(1,this.getNumNodes(),-10,+10) ;
+		bias = NNetMatrix.createRandomMatrix(1,this.getNumNodes(),-1,+1) ;
+	}
+
+	public void enableBias(double min, double max) {
+		bias = NNetMatrix.createRandomMatrix(1,this.getNumNodes(),min,max) ;
+	}
+
+	public boolean isUseSoftMaxActivation() {
+		return useSoftMaxActivation;
+	}
+
+	public void setUseSoftMaxActivation(boolean useSoftMaxActivation) {
+		this.useSoftMaxActivation = useSoftMaxActivation;
 	}
 
 	public void init() {
@@ -76,6 +89,7 @@ public class Layer {
 			break;
 		case OUTPUT_LAYER:
 			weights = NNetMatrix.createRandomMatrix(inputLayer.getNumNodes(),this.getNumNodes()) ;
+			useSoftMaxActivation = NNetParameters.getInstance().isUseSoftMax();
 			break;
 		case HIDDEN_LAYER:
 			weights = NNetMatrix.createRandomMatrix(inputLayer.getNumNodes(),this.getNumNodes()) ;
@@ -92,7 +106,8 @@ public class Layer {
 		case INPUT_LAYER:
 			break;
 		case OUTPUT_LAYER:
-			aValues = hValues = inputLayer.aValues.dot(weights).bias(bias);
+			hValues = inputLayer.aValues.dot(weights).bias(bias);
+			aValues = (useSoftMaxActivation)? hValues.getSoftMax() : hValues;
 			break;
 		case HIDDEN_LAYER:
 			hValues = inputLayer.hValues.dot(weights).bias(bias);
@@ -132,6 +147,8 @@ public class Layer {
 			weights   = weights.subtract(wGradient.scale(NNetParameters.getInstance().getLearningRate()));
 			if (bias!=null) 
 				bias = bias.subtract(wGradient.getRowVector(0).scale(NNetParameters.getInstance().getLearningRate()));
+			if (debugLevel>0)
+				System.out.println("Loss=" + getLoss() + " Bias=" + ((bias!=null)? bias.toString("") : "N\\A"));
 			break;
 		case HIDDEN_LAYER:
 			aGradient = outputLayer.aGradient.dot(outputLayer.weights.transpose());
@@ -140,8 +157,10 @@ public class Layer {
 			weights   = weights.subtract(wGradient.scale(NNetParameters.getInstance().getLearningRate()));
 			if (bias!=null) 
 				bias = bias.subtract(wGradient.getRowVector(0).scale(NNetParameters.getInstance().getLearningRate()));
+			if (debugLevel>0)
+				System.out.println("Bias=" + ((bias!=null)? bias.toString("") : "N\\A"));
 			break;
-		}		
+		}
 	}
 	
 	/**

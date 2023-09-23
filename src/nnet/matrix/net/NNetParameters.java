@@ -8,6 +8,7 @@ public class NNetParameters {
 	private double learningRate = 0.0001;
 	private ActivationFunction activationFunction = ActivationFunction.LINEAR;
 	private int batchSize = 1;
+	private boolean useSoftMax = false;
 	
 	public static NNetParameters getInstance() {
 		if (instance==null)
@@ -37,6 +38,14 @@ public class NNetParameters {
 
 	public void setBatchSize(int batchSize) {
 		this.batchSize = batchSize;
+	}
+
+	public boolean isUseSoftMax() {
+		return useSoftMax;
+	}
+
+	public void setUseSoftMax(boolean useSoftMax) {
+		this.useSoftMax = useSoftMax;
 	}
 
 
