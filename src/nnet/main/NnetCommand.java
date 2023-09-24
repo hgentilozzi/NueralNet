@@ -1,6 +1,8 @@
 package nnet.main;
 
-import nnet.exception.NNetInvalidMatrixOp;
+import java.util.List;
+
+import mxlib.excep.MxlibInvalidMatrixOp;
 import nnet.matrix.NNetMatrix;
 import nnet.matrix.acvt.ActivationFunction;
 import nnet.matrix.data.*;
@@ -9,27 +11,28 @@ import nnet.matrix.net.Network;
 
 public class NnetCommand  {
 
-	public static void main(String[] args) throws NNetInvalidMatrixOp {
+	public static void main(String[] args) throws MxlibInvalidMatrixOp {
 		
 		// Get a training set
-		NNetBatchDataFile bdata = new NNetBatchDataFile("data/TopOrBottomDatabase.csv",3,1);	
+		NNetBatchDataFile bdata = new NNetBatchDataFile("data/TopOrBottomDB.csv",4,2);	
 		
 		
 		// Setup run parameters
-		NNetParameters.getInstance().setActivationFunction(ActivationFunction.SIGMOID);
-		NNetParameters.getInstance().setBatchSize(1);
-		NNetParameters.getInstance().setLearningRate(0.001);
+		NNetParameters.getInstance().setActivationFunction(ActivationFunction.RELU);
+		NNetParameters.getInstance().setBatchSize(4);
+		NNetParameters.getInstance().setLearningRate(0.01);
+		NNetParameters.getInstance().setUseSoftMax(false);
 		
 			
 		try {
-			Network n1 = new Network(3,2,1);
+			Network n1 = new Network(4,2,2);
 			n1.setDebugLevel(0);
-			//n1.enableBias();
+			n1.enableBias();
 			
 			n1.train(bdata, 5000);
 
-			double[][] i_data = new double[][] {{60,80,5}};				
-			double[][] o_data = new double[][] {{82}};				
+			double[][] i_data = new double[][] {{0,0,0,1}};				
+			double[][] o_data = new double[][] {{1,0}};				
 			NNetBatchDataArray tdata = new NNetBatchDataArray(i_data, o_data);
 			
 			while (!tdata.atEof()) {
@@ -40,6 +43,12 @@ public class NnetCommand  {
 				b.expectedResults().print(
 						"Expected");
 			}
+			
+//			List<Double> lossArray = n1.getStats().getLossArray();
+//			for (int i=0;i<lossArray.size();i++) {
+//				System.out.println(i + "," + String.format("%,.8f",lossArray.get(i)));
+//				
+//			}
 
 			
 			

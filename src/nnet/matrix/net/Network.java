@@ -3,7 +3,7 @@ package nnet.matrix.net;
 import java.util.ArrayList;
 import java.util.List;
 
-import nnet.exception.NNetInvalidMatrixOp;
+import mxlib.excep.MxlibInvalidMatrixOp;
 import nnet.exception.NNetInvalidNetwork;
 import nnet.matrix.NNetMatrix;
 import nnet.matrix.acvt.ActivationFunction;
@@ -94,7 +94,7 @@ public class Network {
 		stats.finalResult = outputLayer.getOutputValues();
 	}
 	
-	public void train(NNetMatrix iData, NNetMatrix oData) throws NNetInvalidMatrixOp 
+	public void train(NNetMatrix iData, NNetMatrix oData) throws MxlibInvalidMatrixOp 
 	{
 		
 		inputLayer.setInputData(iData);
@@ -106,18 +106,19 @@ public class Network {
 		for (int i=layers.size()-1;i>=0;i--)
 			layers.get(i).backPropigation();	
 				
-		if (debugLevel>0)
+		if (debugLevel>1)
 		{
 			outputLayer.getOutputValues().print("OL->avalues");
 			outputLayer.getWeights().print("OL->weights");
 		}
 
 		stats.totalIterations++; 
+		stats.addLossResult(getLoss());
 
 	}
 	
 	
-	public NNetMatrix predict(NNetMatrix iData) throws NNetInvalidMatrixOp
+	public NNetMatrix predict(NNetMatrix iData) throws MxlibInvalidMatrixOp
 	{
 		inputLayer.setInputData(iData);
 		
@@ -127,7 +128,7 @@ public class Network {
 		return outputLayer.getOutputValues();
 	}	
 	
-	public double getLoss() {
+	public double getLoss() throws MxlibInvalidMatrixOp {
 		return outputLayer.getLoss();
 	}
 

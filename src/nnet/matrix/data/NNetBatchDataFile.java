@@ -31,7 +31,7 @@ public class NNetBatchDataFile implements NnetBatchDataIntf {
 			reset();
 		} catch (Exception e) {
 			closeReader();
-			error="Failed to initialize. Error=" + e.getMessage();
+			error="NNetBatchDataFile: Failed to initialize. Error=" + e.getMessage();
 		}
 			
 	}
@@ -104,7 +104,7 @@ public class NNetBatchDataFile implements NnetBatchDataIntf {
 			if (parts.length!=(numInNodes+numOutNodes)) {
 				closeReader();
 				reader = null;
-				error = "The data line is ill-formed: line=" + bstr;
+				error = "NNetBatchDataFile: The data line is ill-formed: line=" + bstr;
 				throw new Exception(error);
 			}
 			

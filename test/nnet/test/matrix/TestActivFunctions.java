@@ -1,13 +1,13 @@
 package nnet.test.matrix;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
 
 import nnet.matrix.acvt.ActivationFunctionReLU;
 import nnet.matrix.acvt.ActivationFunctionSigmoid;
 import nnet.matrix.acvt.ActivationFunctionTanh;
-import nnet.matrix.net.*;
 
 class TestActivFunctions {
 	private ActivationFunctionReLU afReLU = new ActivationFunctionReLU();
