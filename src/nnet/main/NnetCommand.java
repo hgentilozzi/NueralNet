@@ -14,7 +14,7 @@ public class NnetCommand  {
 	public static void main(String[] args) throws MxlibInvalidMatrixOp {
 		
 		// Get a training set
-		NNetBatchDataFile bdata = new NNetBatchDataFile("data/TopOrBottomDB.csv",4,2);	
+		NNetBatchDataFile bdata = new NNetBatchDataFile("data/iris/iris.data",4,1);	
 		
 		
 		// Setup run parameters
@@ -23,16 +23,16 @@ public class NnetCommand  {
 		NNetParameters.getInstance().setLearningRate(0.01);
 		NNetParameters.getInstance().setUseSoftMax(false);
 		
-			
 		try {
-			Network n1 = new Network(4,2,2);
+			Network n1 = new Network(4,3,1);
 			n1.setDebugLevel(0);
 			n1.enableBias();
 			
-			n1.train(bdata, 5000);
+			n1.train(bdata, 500);
 
-			double[][] i_data = new double[][] {{0,0,0,1}};				
-			double[][] o_data = new double[][] {{1,0}};				
+			double[][] i_data = new double[][] {{5.1,3.5,1.4,0.2},{7.0,3.2,4.7,1.4},{6.3,3.3,6.0,2.5,3}};				
+			double[][] o_data = new double[][] {{1},{2},{3}};				
+
 			NNetBatchDataArray tdata = new NNetBatchDataArray(i_data, o_data);
 			
 			while (!tdata.atEof()) {
@@ -53,7 +53,7 @@ public class NnetCommand  {
 			
 			
 		} catch (Exception e) {
-			System.err.println(e);
+			e.printStackTrace();
 		}
 		
 
