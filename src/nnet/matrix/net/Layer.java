@@ -1,6 +1,6 @@
 package nnet.matrix.net;
 
-import nnet.exception.NNetInvalidMatrixOp;
+import mxlib.excep.MxlibInvalidMatrixOp;
 import nnet.matrix.NNetMatrix;
 import nnet.matrix.acvt.ActivationFunction;
 
@@ -99,9 +99,9 @@ public class Layer {
 	
 	/**
 	 * Do a feed forward. 
-	 * @throws NNetInvalidMatrixOp 
+	 * @throws MxlibInvalidMatrixOp 
 	 */
-	public void feedForward() throws NNetInvalidMatrixOp {
+	public void feedForward() throws MxlibInvalidMatrixOp {
 		switch (layerType) {
 		case INPUT_LAYER:
 			break;
@@ -136,7 +136,7 @@ public class Layer {
 	
 
 	
-	public void backPropigation() throws NNetInvalidMatrixOp {
+	public void backPropigation() throws MxlibInvalidMatrixOp {
 		
 		switch (layerType) {
 		case INPUT_LAYER:
@@ -166,12 +166,13 @@ public class Layer {
 	/**
 	 * The loss function for output layer else zero, Use mean squared error
 	 * @return
+	 * @throws MxlibInvalidMatrixOp 
 	 */
-	public double getLoss() {
+	public double getLoss() throws MxlibInvalidMatrixOp {
 		
 		double ret = 0;
 		if (isOutputLayer()) {
-			double sumsqrs = hValues.subtract(tValues).square().sum();
+			double sumsqrs = hValues.subtract(tValues).squareElement().sum();
 			ret = 1.0 / ((hValues.getRows()*hValues.getCols()) * sumsqrs);
 		}
 			

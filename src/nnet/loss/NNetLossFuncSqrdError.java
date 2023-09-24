@@ -1,6 +1,7 @@
 package nnet.loss;
 
-import nnet.matrix.Matrix;
+import mxlib.excep.MxlibInvalidMatrixOp;
+import nnet.matrix.NNetMatrix;
 
 public class NNetLossFuncSqrdError implements NNetLossFunction {
 
@@ -8,8 +9,8 @@ public class NNetLossFuncSqrdError implements NNetLossFunction {
 	}
 
 	@Override
-	public double getLoss(Matrix actual, Matrix expected) {
-		return actual.subtract(expected).square().sum();
+	public double getLoss(NNetMatrix actual, NNetMatrix expected) throws MxlibInvalidMatrixOp {
+		return actual.subtract(expected).squareElement().sum();
 	}
 
 }

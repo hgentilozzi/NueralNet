@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-import nnet.exception.NNetInvalidMatrixOp;
+import mxlib.excep.MxlibInvalidMatrixOp;
 import nnet.matrix.NNetMatrix;
 import nnet.matrix.acvt.ActivationFunction;
 import nnet.matrix.net.*;
@@ -20,7 +20,7 @@ class TestLayer {
 	}
 	
 	@Test
-	void testInputLayer() throws NNetInvalidMatrixOp {
+	void testInputLayer() throws MxlibInvalidMatrixOp {
 		// One row batch
 		double[][] data = new double[][] {{1,2}};
 		NNetMatrix x = new NNetMatrix(data);
@@ -47,7 +47,7 @@ class TestLayer {
 	}
 	
 	@Test
-	void testOutputLayer() throws NNetInvalidMatrixOp {
+	void testOutputLayer() throws MxlibInvalidMatrixOp {
 		// One row batch input layer
 		double[][] idata = new double[][] {{1}};
 		NNetMatrix im = new NNetMatrix(idata);
@@ -84,7 +84,7 @@ class TestLayer {
 	
 	
 	@Test
-	void testHiddenLayer() throws NNetInvalidMatrixOp {
+	void testHiddenLayer() throws MxlibInvalidMatrixOp {
 		// One row batch input layer
 		double[][] idata = new double[][] {{1}};
 		NNetMatrix im = new NNetMatrix(idata);

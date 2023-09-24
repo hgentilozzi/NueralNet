@@ -1,6 +1,10 @@
 package nnet.matrix;
 
-import nnet.exception.NNetInvalidMatrixOp;
+import java.util.function.Function;
+
+import mxlib.excep.MxlibInvalidMatrixOp;
+import mxlib.matrix.Matrix;
+import mxlib.matrix.MxArray;
 import nnet.matrix.acvt.ActivationFunction;
 
 public class NNetMatrix extends Matrix {
@@ -26,23 +30,25 @@ public class NNetMatrix extends Matrix {
 	}
 
 
-	public NNetMatrix copyAndRelu()  {
+	/**
+	 * Generic update of matrix
+	 * @param m - scalar
+	 * @return new vector as (this * m)
+	 */
+	public NNetMatrix matrixFunc(Function<Double,Double> func) {
 		NNetMatrix ret = new NNetMatrix(rows,cols);
 		for (int r=0;r<rows;r++)
 			for (int c=0;c<cols;c++)
-				ret.data[r][c] = (data[r][c]>=0)? data[r][c] : 0;		
+				ret.data[r][c] = func.apply(data[r][c]);
+		
 		return ret;
+	}
+	public NNetMatrix copyAndRelu()  {
+		return matrixFunc(v -> (v>=0? v : 0));
 	}
 	
 	public NNetMatrix getActivation(ActivationFunction af) {
-		NNetMatrix ret = new NNetMatrix(rows,cols);
-		for (int r=0;r<rows;r++)
-			for (int c=0;c<cols;c++)
-			{
-				ret.data[r][c] = af.f(data[r][c]);
-			}
-		
-		return ret;
+		return matrixFunc(v -> af.f(v));
 	}
 
 	
@@ -65,31 +71,16 @@ public class NNetMatrix extends Matrix {
 	public NNetMatrix getGradient(ActivationFunction af) {
 		if (af==null)
 			return copy();
-		
-		NNetMatrix ret = new NNetMatrix(rows,cols);
-		for (int r=0;r<rows;r++)
-			for (int c=0;c<cols;c++)
-				ret.data[r][c] = af.grad(data[r][c]);
-		
-		return ret;
+
+		return matrixFunc(v -> af.grad(v));
 	}
 
-	public NNetMatrix scale(double scaler) {
-		NNetMatrix ret = new NNetMatrix(rows,cols);
-		for (int r=0;r<rows;r++)
-			for (int c=0;c<cols;c++)
-				ret.data[r][c] = data[r][c]*scaler;
-		
-		return ret;
+	public NNetMatrix scale(double m) {
+		return matrixFunc(d -> d*m);
 	}
 
-	public NNetMatrix shift(double bias) {
-		NNetMatrix ret = new NNetMatrix(rows,cols);
-		for (int r=0;r<rows;r++)
-			for (int c=0;c<cols;c++)
-				ret.data[r][c] = data[r][c]+bias;
-		
-		return ret;
+	public NNetMatrix shift(double b) {
+		return matrixFunc(d -> d+b);
 	}
 
 	public NNetMatrix xlate(double m,double b) {
@@ -101,32 +92,28 @@ public class NNetMatrix extends Matrix {
 		return ret;
 	}
 
-	public NNetMatrix dot(NNetMatrix b) throws NNetInvalidMatrixOp {
-		return (NNetMatrix) Matrix.dot(this, b);
+	public NNetMatrix dot(NNetMatrix b) throws MxlibInvalidMatrixOp {
+		return new NNetMatrix(MxArray.dot(this.data, b.data));
 	}
 
-	public NNetMatrix add(NNetMatrix b)  {
-		return (NNetMatrix) Matrix.add(this, b);
+	public NNetMatrix add(NNetMatrix b) throws MxlibInvalidMatrixOp  {
+		return new NNetMatrix(MxArray.add(this.data, b.data));
 	}
 
-	public NNetMatrix subtract(NNetMatrix b)  {
-		return (NNetMatrix) Matrix.subtract(this, b);
+	public NNetMatrix subtract(NNetMatrix b) throws MxlibInvalidMatrixOp  {
+		return new NNetMatrix(MxArray.subtract(this.data, b.data));
 	}
 
 	public NNetMatrix transpose() {
-		return (NNetMatrix) Matrix.transpose(this);
+		return new NNetMatrix(MxArray.transpose(this.data));
 	}
 
 	public NNetMatrix squareElement() {
-		return (NNetMatrix) Matrix.squareElement(this);
-	}
-	
-	public static NNetMatrix createIdentMatrix(int rows, int cols)  {
-		return (NNetMatrix) Matrix.createIdentMatrix(NNetMatrix.class,rows,cols);
+		return matrixFunc(d -> d*d);
 	}
 	
 	public Matrix absoluteValue() {
-		return (NNetMatrix) Matrix.absoluteValue(this);
+		return matrixFunc(d -> Math.abs(d));
 	}
 	/**
 	 * Return a select row of the matrix
@@ -160,14 +147,18 @@ public class NNetMatrix extends Matrix {
 
 	
 	public static NNetMatrix createRandomMatrix(int rows, int cols)  {
-		NNetMatrix ret = (NNetMatrix) newInstance(NNetMatrix.class,rows,cols);
-		ret.randomize();
-		return ret;
+		return new NNetMatrix(rows,cols,true);
 	}
 
 	public static NNetMatrix createRandomMatrix(int rows, int cols, double minv, double maxv)  {
-		NNetMatrix ret = (NNetMatrix) newInstance(NNetMatrix.class,rows,cols);
+		NNetMatrix ret = new NNetMatrix(rows,cols);
 		ret.randomize(minv,maxv);
+		return ret;
+	}
+
+	public static NNetMatrix createRandomMatrix(int rows, int cols, double fillValue)  {
+		NNetMatrix ret = new NNetMatrix(rows,cols);
+		ret.fill(fillValue);
 		return ret;
 	}
 
@@ -188,6 +179,14 @@ public class NNetMatrix extends Matrix {
 				ret.data[r][c] = data[r][c] + bias.data[0][c];
 		
 		return ret;
+	}
+
+	
+	/**
+	 * Static methods
+	 */
+	public static NNetMatrix createIdentMatrix(int rows) {
+		return new NNetMatrix(MxArray.createIdent(rows));
 	}
 
 	

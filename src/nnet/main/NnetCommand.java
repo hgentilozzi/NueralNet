@@ -2,7 +2,7 @@ package nnet.main;
 
 import java.util.List;
 
-import nnet.exception.NNetInvalidMatrixOp;
+import mxlib.excep.MxlibInvalidMatrixOp;
 import nnet.matrix.NNetMatrix;
 import nnet.matrix.acvt.ActivationFunction;
 import nnet.matrix.data.*;
@@ -11,7 +11,7 @@ import nnet.matrix.net.Network;
 
 public class NnetCommand  {
 
-	public static void main(String[] args) throws NNetInvalidMatrixOp {
+	public static void main(String[] args) throws MxlibInvalidMatrixOp {
 		
 		// Get a training set
 		NNetBatchDataFile bdata = new NNetBatchDataFile("data/TopOrBottomDB.csv",4,2);	

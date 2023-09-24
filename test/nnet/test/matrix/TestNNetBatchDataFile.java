@@ -12,7 +12,7 @@ class TestNNetBatchDataFile {
 	void testFileNotFound() {
 		NNetBatchDataFile ndb = new NNetBatchDataFile("XXXX.XX",1,1);
 		assertFalse(ndb.validate());
-		assertEquals("Failed to initialize. Error=XXXX.XX (The system cannot find the file specified)",
+		assertEquals("NNetBatchDataFile: Failed to initialize. Error=XXXX.XX (The system cannot find the file specified)",
 				ndb.getError());
 	}
 

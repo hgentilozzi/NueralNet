@@ -4,7 +4,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.Test;
 
-import nnet.exception.NNetInvalidMatrixOp;
+import mxlib.excep.MxlibInvalidMatrixOp;
 import nnet.matrix.NNetMatrix;
 
 class TestNNetMatrix {
@@ -85,7 +85,7 @@ class TestNNetMatrix {
 		NNetMatrix z=null;
 		try {
 			z = x.dot(y);
-		} catch (NNetInvalidMatrixOp e) {
+		} catch (MxlibInvalidMatrixOp e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
@@ -119,7 +119,7 @@ class TestNNetMatrix {
 		NNetMatrix z=null;
 		try {
 			z = x.dot(y);
-		} catch (NNetInvalidMatrixOp e) {
+		} catch (MxlibInvalidMatrixOp e) {
 			e.printStackTrace();
 		}
 
@@ -147,7 +147,7 @@ class TestNNetMatrix {
 	}
 
 	@Test
-	void testAdd() {
+	void testAdd() throws MxlibInvalidMatrixOp {
 		NNetMatrix x = new NNetMatrix(2,2);
 		NNetMatrix y = new NNetMatrix(2,2);
 		
@@ -170,7 +170,7 @@ class TestNNetMatrix {
 	}
 
 	@Test
-	void testSubtract() {
+	void testSubtract() throws MxlibInvalidMatrixOp {
 		NNetMatrix x = new NNetMatrix(2,2);
 		NNetMatrix y = new NNetMatrix(2,2);
 		
@@ -205,7 +205,7 @@ class TestNNetMatrix {
 	@Test
 	void testgetRowVector() {
 		// Square matrix
-		NNetMatrix x = (NNetMatrix) NNetMatrix.createIdentMatrix(2,2);
+		NNetMatrix x = (NNetMatrix) NNetMatrix.createIdentMatrix(2);
 		x.set(0, 0, 1);
 		x.set(0, 1, 2);
 		x.set(1, 0, 3);
@@ -224,7 +224,7 @@ class TestNNetMatrix {
 	@Test
 	void testgetColVector() {
 		// Square matrix
-		NNetMatrix x = (NNetMatrix) NNetMatrix.createIdentMatrix(2,2);
+		NNetMatrix x = (NNetMatrix) NNetMatrix.createIdentMatrix(2);
 		x.set(0, 0, 1);
 		x.set(0, 1, 2);
 		x.set(1, 0, 3);
@@ -275,7 +275,7 @@ class TestNNetMatrix {
 	@Test
 	void testCreateIdentMatrix() {
 		// Square matrix
-		NNetMatrix x = NNetMatrix.createIdentMatrix(2,2);
+		NNetMatrix x = NNetMatrix.createIdentMatrix(2);
 	
 		for (int r=0;r<x.getRows();r++) {
 			for (int c=0;c<x.getCols();c++) {
@@ -285,31 +285,6 @@ class TestNNetMatrix {
 					assertEquals(0, x.get(r, c));
 			}
 		}
-	
-		// Horizontal rectangle matrix
-		x = NNetMatrix.createIdentMatrix(2,3);
-	
-		for (int r=0;r<x.getRows();r++) {
-			for (int c=0;c<x.getCols();c++) {
-				if (r==c)
-					assertEquals(1, x.get(r, c));
-				else
-					assertEquals(0, x.get(r, c));
-			}
-		}
-		
-		// Vertical rectangle matrix
-		x = NNetMatrix.createIdentMatrix(5,2);
-	
-		for (int r=0;r<x.getRows();r++) {
-			for (int c=0;c<x.getCols();c++) {
-				if (r==c)
-					assertEquals(1, x.get(r, c));
-				else
-					assertEquals(0, x.get(r, c));
-			}
-		}
-		
 	}
 
 	
