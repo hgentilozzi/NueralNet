@@ -72,6 +72,11 @@ public class Network {
 		for (int nl = 1; nl < numLayers; nl++) 
 			layers.get(nl).enableBias();
 	}
+	
+	public void setBias(double value) {
+		for (int nl = 1; nl < numLayers; nl++) 
+			layers.get(nl).setBias(value);
+	}
 
 	/**
 	 * Train using an input stream of and train each batch
