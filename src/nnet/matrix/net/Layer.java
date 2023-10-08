@@ -19,7 +19,7 @@ public class Layer {
 	private int batchSize;
 	private int numNodes;
 	private int debugLevel = 0;
-	private boolean useSoftMaxActivation = false;
+	private double learningRate = 0.1;
 	
 	private LayerType layerType; 
 
@@ -30,7 +30,7 @@ public class Layer {
 	public Layer(LayerType layerType, int numNodes,ActivationFunction actvFunc) {
 		this.layerType = layerType;
 		this.numNodes = numNodes;
-		this.actvFunc = actvFunc;
+		this.actvFunc = (actvFunc==null)? ActivationFunction.LINEAR : actvFunc;
 	}
 	
 	public void setInputData(NNetMatrix batch) {
@@ -79,12 +79,12 @@ public class Layer {
 		bias = NNetMatrix.createRandomMatrix(1,this.getNumNodes(),value) ;
 	}
 
-	public boolean isUseSoftMaxActivation() {
-		return useSoftMaxActivation;
+	public double getLearningRate() {
+		return learningRate;
 	}
 
-	public void setUseSoftMaxActivation(boolean useSoftMaxActivation) {
-		this.useSoftMaxActivation = useSoftMaxActivation;
+	public void setLearningRate(double learningRate) {
+		this.learningRate = learningRate;
 	}
 
 	public void init() {
@@ -92,11 +92,10 @@ public class Layer {
 		case INPUT_LAYER:
 			break;
 		case OUTPUT_LAYER:
-			weights = NNetMatrix.createRandomMatrix(inputLayer.getNumNodes(),this.getNumNodes()) ;
-			useSoftMaxActivation = NNetParameters.getInstance().isUseSoftMax();
+			weights = NNetMatrix.createRandomMatrix(inputLayer.getNumNodes(),this.getNumNodes(),-1,1) ;
 			break;
 		case HIDDEN_LAYER:
-			weights = NNetMatrix.createRandomMatrix(inputLayer.getNumNodes(),this.getNumNodes()) ;
+			weights = NNetMatrix.createRandomMatrix(inputLayer.getNumNodes(),this.getNumNodes(),-1,1) ;
 			break;
 		}
 	}
@@ -106,31 +105,31 @@ public class Layer {
 	 * @throws MxlibInvalidMatrixOp 
 	 */
 	public void feedForward() throws MxlibInvalidMatrixOp {
-		switch (layerType) {
-		case INPUT_LAYER:
-			break;
-		case OUTPUT_LAYER:
-			hValues = inputLayer.aValues.dot(weights).bias(bias);
-			aValues = (useSoftMaxActivation)? hValues.getSoftMax() : hValues;
-			break;
-		case HIDDEN_LAYER:
-			hValues = inputLayer.hValues.dot(weights).bias(bias);
-			aValues = hValues.getActivation(actvFunc);
-			break;
-		}	
+		if (layerType==LayerType.INPUT_LAYER)
+		{
+			if (debugLevel>0)
+			{
+				aValues.print(layerType + ": avalues");
+			}
+			
+			aValues = hValues;
+			return;
+		}
+
+		hValues = inputLayer.aValues.dot(weights).bias(bias);
+		aValues = actvFunc.f(hValues);
 		
 		if (debugLevel>1)
 		{
+			weights.print(layerType + ": weights");
 			hValues.print(layerType + ": hvalues");
-			
-			if (!isInputLayer()) {
-				aValues.print(layerType + ": avalues");
-				weights.print(layerType + ": weights");
-			}
-			
+			aValues.print(layerType + ": avalues");
 			if (bias!=null)
 				bias.print(layerType + ": bias");
+			if (isOutputLayer())
+				tValues.print(layerType + ": tvalues");
 		}
+
 	}
 
 	
@@ -143,18 +142,20 @@ public class Layer {
 			break;
 		case OUTPUT_LAYER:
 			aGradient = aValues.subtract(tValues).scale(2.0);	
-			wGradient = inputLayer.aValues.transpose().dot(aGradient);	
-			weights   = weights.subtract(wGradient.scale(NNetParameters.getInstance().getLearningRate()));
+			hGradient = actvFunc.grad(aGradient);
+			wGradient = inputLayer.aValues.transpose().dot(hGradient).scale(learningRate);	
+			weights   = weights.subtract(wGradient);
 			if (bias!=null) 
-				bias = bias.subtract(wGradient.getRowVector(0).scale(NNetParameters.getInstance().getLearningRate()));
+				bias = bias.subtract(wGradient.getRowVector(0)).scale(learningRate);
 			break;
 		case HIDDEN_LAYER:
 			aGradient = outputLayer.aGradient.dot(outputLayer.weights.transpose());
-			hGradient = aGradient.getGradient(actvFunc);
-			wGradient = inputLayer.aValues.transpose().dot(hGradient);	
-			weights   = weights.subtract(wGradient.scale(NNetParameters.getInstance().getLearningRate()));
+			hGradient = actvFunc.grad(aGradient);
+
+			wGradient = inputLayer.aValues.transpose().dot(hGradient).scale(learningRate);	
+			weights   = weights.subtract(wGradient);
 			if (bias!=null) 
-				bias = bias.subtract(wGradient.getRowVector(0).scale(NNetParameters.getInstance().getLearningRate()));
+				bias = bias.subtract(wGradient.getRowVector(0)).scale(learningRate);
 			break;
 		}
 		
@@ -164,11 +165,17 @@ public class Layer {
 			
 			if (!isInputLayer()) {
 				aGradient.print(layerType + ": aGradient");
+				hGradient.print(layerType + ": hGradient");
 				wGradient.print(layerType + ": wGradient");
 				weights.print(layerType + ": weights");
-				bias.print(layerType + ": bias");
-			}
-			
+				
+				if (bias!=null)
+					bias.print(layerType + ": bias");
+			}			
+		}
+		
+		if (debugLevel>0)
+		{
 			if (isOutputLayer()) {
 				System.out.println("Loss=" + getLoss());
 			}
@@ -185,7 +192,7 @@ public class Layer {
 		double ret = 0;
 		if (isOutputLayer()) {
 			double sumsqrs = hValues.subtract(tValues).squareElement().sum();
-			ret = 1.0 / ((hValues.getRows()*hValues.getCols()) * sumsqrs);
+			ret = (sumsqrs / (hValues.getRows()*hValues.getCols()));
 		}
 			
 		return ret;

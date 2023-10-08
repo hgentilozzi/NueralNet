@@ -1,0 +1,21 @@
+{
+	"name" : "Small Test",
+	"desc" : "A small network for debuging the code",
+	"learningrate" : "0.01",  
+	"layers" : [ 
+		{
+			"nodes" : "2"
+		},
+		{
+			"nodes" : "2",
+			"activationfunction" : "SIGMOID"
+		},
+		{
+			"nodes" : "1",
+			"activationfunction" : "SOFTMAX"
+		}
+	],
+	"trainingfilename" : "data/smallTest/training.csv",
+	"testfilename" : "data/smallTest/test.csv"
+	
+}

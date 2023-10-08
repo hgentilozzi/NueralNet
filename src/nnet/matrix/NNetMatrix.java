@@ -46,10 +46,6 @@ public class NNetMatrix extends Matrix {
 	public NNetMatrix copyAndRelu()  {
 		return matrixFunc(v -> (v>=0? v : 0));
 	}
-	
-	public NNetMatrix getActivation(ActivationFunction af) {
-		return matrixFunc(v -> af.f(v));
-	}
 
 	
 	public NNetMatrix getSoftMax() {
@@ -65,14 +61,6 @@ public class NNetMatrix extends Matrix {
 		}
 		
 		return ret;
-	}
-
-	
-	public NNetMatrix getGradient(ActivationFunction af) {
-		if (af==null)
-			return copy();
-
-		return matrixFunc(v -> af.grad(v));
 	}
 
 	public NNetMatrix scale(double m) {
